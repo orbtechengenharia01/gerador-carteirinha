@@ -101,11 +101,21 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
 
   final List<String> _predefinedLogos = [
     'Nenhum',
-    'HOGWARTS.png',
+    'FGV.png',
+    'MACKENZIE.png',
+    'PUC-Minas.png',
+    'PUC-SP.png',
+    'UFF.png',
     'UFMG.png',
     'UFRJ.png',
+    'UFU.png',
+    'UFV.png',
     'UNESP.png',
+    'UNIBH.png',
+    'UNICAMP.png',
+    'UNIUBE.png',
     'USP.png',
+    'U.png',
   ];
   String _selectedPredefinedLogo = 'Nenhum';
 
@@ -351,16 +361,7 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
                       heightFactor: 0.95,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 15.0),
-                        child: Opacity(
-                          opacity: 0.05,
-                          child: ColorFiltered(
-                            colorFilter: const ColorFilter.mode(
-                              Colors.grey,
-                              BlendMode.saturation,
-                            ),
-                            child: watermarkLogo,
-                          ),
-                        ),
+                        child: Opacity(opacity: 0.05, child: watermarkLogo),
                       ),
                     ),
                   ),
