@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'adsense_widget_stub.dart'
     if (dart.library.html) 'adsense_widget_web.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,8 +12,13 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:screenshot/screenshot.dart';
 import 'save_file_mobile.dart' if (dart.library.html) 'save_file_web.dart';
 
-void main() {
+void main() async {
+  // Garante que o Flutter está inicializado
   WidgetsFlutterBinding.ensureInitialized();
+  // Inicializa o SDK de anúncios para mobile
+  if (!kIsWeb) {
+    await MobileAds.instance.initialize();
+  }
   runApp(const StudentCardApp());
 }
 
@@ -115,12 +122,15 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
     'UNICAMP.png',
     'UNIUBE.png',
     'USP.png',
-    'U.png',
   ];
   String _selectedPredefinedLogo = 'Nenhum';
 
   final _screenshotController = ScreenshotController();
   final _formKey = GlobalKey<FormState>();
+
+  // Variáveis para o AdMob
+  BannerAd? _bannerAd;
+  RewardedInterstitialAd? _rewardedInterstitialAd;
 
   @override
   void initState() {
@@ -130,6 +140,10 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
     _rgmController.addListener(() => setState(() {}));
     _validityController.addListener(() => setState(() {}));
     _universityNameController.addListener(() => setState(() {}));
+
+    if (!kIsWeb) {
+      _loadBannerAd();
+    }
   }
 
   @override
@@ -139,7 +153,60 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
     _rgmController.dispose();
     _validityController.dispose();
     _universityNameController.dispose();
+    _bannerAd?.dispose();
+    _rewardedInterstitialAd?.dispose();
     super.dispose();
+  }
+
+  void _loadBannerAd() {
+    final adUnitId = Platform.isAndroid
+        ? 'ca-app-pub-3940256099942544/6300978111'
+        : 'ca-app-pub-3940256099942544/2934735716';
+
+    _bannerAd = BannerAd(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {});
+        },
+        onAdFailedToLoad: (ad, err) {
+          ad.dispose();
+        },
+      ),
+    )..load();
+  }
+
+  void _showRewardedAd(Function onAdDismissed) {
+    final adUnitId = Platform.isAndroid
+        ? 'ca-app-pub-3940256099942544/5354046379'
+        : 'ca-app-pub-3940256099942544/6978759866';
+
+    RewardedInterstitialAd.load(
+      adUnitId: adUnitId,
+      request: const AdRequest(),
+      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedInterstitialAd = ad;
+          _rewardedInterstitialAd?.fullScreenContentCallback =
+              FullScreenContentCallback(
+                onAdDismissedFullScreenContent: (ad) {
+                  onAdDismissed();
+                  ad.dispose();
+                },
+                onAdFailedToShowFullScreenContent: (ad, err) {
+                  ad.dispose();
+                  onAdDismissed();
+                },
+              );
+          _rewardedInterstitialAd?.show(onUserEarnedReward: (ad, reward) {});
+        },
+        onAdFailedToLoad: (err) {
+          onAdDismissed();
+        },
+      ),
+    );
   }
 
   Future<void> _pickStudentImage() async {
@@ -185,13 +252,6 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
         _customUniversityLogoBytes = null;
       });
     }
-  }
-
-  Future<void> _showAdAndDownload(Function downloadFunction) async {
-    // Com os anúncios de vinheta ativados no index.html, o Google gerencia a exibição.
-    // Nós simplesmente executamos o download. O AdSense pode interceptar essa ação
-    // para exibir um anúncio, se julgar apropriado.
-    downloadFunction();
   }
 
   Future<void> _downloadAsPng() async {
@@ -253,55 +313,67 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
       appBar: AppBar(title: const Text('Gerador de Carteirinha')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
           children: [
-            if (kIsWeb)
-              Column(
-                children: [
-                  const SizedBox(height: 284),
-                  SizedBox(
-                    width: 200,
-                    height: 600,
-                    child: AdsenseWidget(
-                      adClient: 'ca-pub-6382507327811351',
-                      adSlot: '6916028297',
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (kIsWeb)
+                  Column(
+                    children: [
+                      const SizedBox(height: 284),
+                      SizedBox(
+                        width: 200,
+                        height: 600,
+                        child: AdsenseWidget(
+                          adClient: 'ca-pub-6382507327811351',
+                          adSlot: '6916028297',
+                        ),
+                      ),
+                    ],
+                  ),
+                if (kIsWeb) const SizedBox(width: 24),
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 500),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _buildCardPreview(),
+                        const SizedBox(height: 24),
+                        _buildForm(),
+                        const SizedBox(height: 24),
+                        _buildAdOrDownloadSection(),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            if (kIsWeb) const SizedBox(width: 24),
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildCardPreview(),
-                    const SizedBox(height: 24),
-                    _buildForm(),
-                    const SizedBox(height: 24),
-                    _buildAdOrDownloadSection(),
-                  ],
                 ),
-              ),
-            ),
-            if (kIsWeb) const SizedBox(width: 24),
-            if (kIsWeb)
-              Column(
-                children: [
-                  const SizedBox(height: 284),
-
-                  SizedBox(
-                    width: 200,
-                    height: 600,
-                    child: AdsenseWidget(
-                      adClient: 'ca-pub-6382507327811351',
-                      adSlot: '7330961262',
-                    ),
+                if (kIsWeb) const SizedBox(width: 24),
+                if (kIsWeb)
+                  Column(
+                    children: [
+                      const SizedBox(height: 284),
+                      SizedBox(
+                        width: 200,
+                        height: 600,
+                        child: AdsenseWidget(
+                          adClient: 'ca-pub-6382507327811351',
+                          adSlot: '7330961262',
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+              ],
+            ),
+            if (!kIsWeb && _bannerAd != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
               ),
           ],
         ),
@@ -361,7 +433,16 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
                       heightFactor: 0.95,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 15.0),
-                        child: Opacity(opacity: 0.05, child: watermarkLogo),
+                        child: Opacity(
+                          opacity: 0.05,
+                          child: ColorFiltered(
+                            colorFilter: const ColorFilter.mode(
+                              Colors.grey,
+                              BlendMode.saturation,
+                            ),
+                            child: watermarkLogo,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -752,7 +833,13 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
     return Column(
       children: [
         ElevatedButton(
-          onPressed: () => _downloadAsPng(),
+          onPressed: () {
+            if (kIsWeb) {
+              _downloadAsPng();
+            } else {
+              _showRewardedAd(_downloadAsPng);
+            }
+          },
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -764,7 +851,13 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
         ),
         const SizedBox(height: 12),
         OutlinedButton(
-          onPressed: () => _downloadAsPdf(),
+          onPressed: () {
+            if (kIsWeb) {
+              _downloadAsPdf();
+            } else {
+              _showRewardedAd(_downloadAsPdf);
+            }
+          },
           child: const Row(
             mainAxisSize: MainAxisSize.min,
             children: [
