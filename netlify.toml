@@ -1,0 +1,17 @@
+# Configurações de Build para o Netlify
+[build]
+  # Comando completo que:
+  # 1. Baixa a versão estável do Flutter
+  # 2. Verifica a instalação
+  # 3. Baixa as dependências do seu projeto
+  # 4. Constrói a versão final e otimizada do seu site
+  command = "git clone https://github.com/flutter/flutter.git --depth 1 -b stable && ./flutter/bin/flutter doctor && ./flutter/bin/flutter pub get && ./flutter/bin/flutter build web --release"
+
+  # Pasta que o Netlify deve publicar após o build
+  publish = "build/web"
+
+# Regra de Redirecionamento para evitar erros 404 (essencial para apps Flutter)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
