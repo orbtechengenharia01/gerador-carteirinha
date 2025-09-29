@@ -307,19 +307,41 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
     await saveFile(pdfBytes, 'pdf');
   }
 
+  // MÉTODO EXTRAÍDO PARA O CONTEÚDO CENTRAL
+  Widget _buildCentralContent() {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 500),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildCardPreview(),
+            const SizedBox(height: 24),
+            _buildForm(),
+            const SizedBox(height: 24),
+            _buildAdOrDownloadSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Gerador de Carteirinha')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (kIsWeb)
+        // LAYOUTBUILDER PARA CRIAR A INTERFACE RESPONSIVA
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Se a tela for larga (maior que 950 pixels), mostra os 3 painéis
+            if (constraints.maxWidth > 950 && kIsWeb) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Banner Esquerdo
                   Column(
                     children: [
                       const SizedBox(height: 284),
@@ -333,24 +355,11 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
                       ),
                     ],
                   ),
-                if (kIsWeb) const SizedBox(width: 24),
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 500),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _buildCardPreview(),
-                        const SizedBox(height: 24),
-                        _buildForm(),
-                        const SizedBox(height: 24),
-                        _buildAdOrDownloadSection(),
-                      ],
-                    ),
-                  ),
-                ),
-                if (kIsWeb) const SizedBox(width: 24),
-                if (kIsWeb)
+                  const SizedBox(width: 24),
+                  // Conteúdo Central
+                  _buildCentralContent(),
+                  const SizedBox(width: 24),
+                  // Banner Direito
                   Column(
                     children: [
                       const SizedBox(height: 284),
@@ -364,18 +373,26 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
                       ),
                     ],
                   ),
-              ],
-            ),
-            if (!kIsWeb && _bannerAd != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: SizedBox(
-                  width: _bannerAd!.size.width.toDouble(),
-                  height: _bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: _bannerAd!),
-                ),
-              ),
-          ],
+                ],
+              );
+            } else {
+              // Se a tela for estreita (mobile ou web mobile), mostra apenas o conteúdo central
+              return Column(
+                children: [
+                  _buildCentralContent(),
+                  if (!kIsWeb && _bannerAd != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24.0),
+                      child: SizedBox(
+                        width: _bannerAd!.size.width.toDouble(),
+                        height: _bannerAd!.size.height.toDouble(),
+                        child: AdWidget(ad: _bannerAd!),
+                      ),
+                    ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );
@@ -867,7 +884,50 @@ class _CardGeneratorScreenState extends State<CardGeneratorScreen> {
             ],
           ),
         ),
+
+        // ADICIONADO AQUI:
+        if (kIsWeb) _buildPwaInstallBanner(),
       ],
+    );
+  }
+
+  // WIDGET ADICIONADO AQUI:
+  Widget _buildPwaInstallBanner() {
+    return Container(
+      margin: const EdgeInsets.only(top: 24),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: const Column(
+        children: [
+          Icon(
+            Icons.install_mobile_rounded,
+            color: Color(0xFF1976D2),
+            size: 40,
+          ),
+          SizedBox(height: 12),
+          Text(
+            "Instale na sua Tela Inicial!",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 8),
+          Text(
+            "Para uma experiência mais rápida, adicione nosso app à sua tela inicial. Procure a opção 'Instalar' ou 'Adicionar à Tela de Início' no menu do seu navegador.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
     );
   }
 }
