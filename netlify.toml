@@ -1,9 +1,13 @@
-# Configurações de Build para o Netlify
+# Configurações de Build Finais para o Netlify
 [build]
-  # Comando simplificado, sem a opção --web-renderer
-  command = "git clone https://github.com/flutter/flutter.git --depth 1 -b stable && ./flutter/bin/flutter pub get && ./flutter/bin/flutter build web --release"
+  # Comando robusto que:
+  # 1. Verifica se a pasta 'flutter' existe: se sim, a atualiza; se não, a baixa.
+  # 2. Habilita o suporte para web.
+  # 3. Baixa as dependências do seu projeto.
+  # 4. Constrói a versão final e otimizada do seu site.
+  command = "if [ -d 'flutter' ]; then (cd flutter && git pull); else git clone https://github.com/flutter/flutter.git --depth 1 -b stable; fi && ./flutter/bin/flutter config --enable-web && ./flutter/bin/flutter pub get && ./flutter/bin/flutter build web --release"
 
-  # Pasta que o Netlify deve publicar após o build
+  # Pasta que o Netlify deve publicar
   publish = "build/web"
 
 # Regra de Redirecionamento para evitar erros 404
