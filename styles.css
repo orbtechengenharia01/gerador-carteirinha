@@ -1,0 +1,675 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F0F2F5;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* Header */
+.app-header {
+    background-color: #1976D2;
+    color: white;
+    padding: 16px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.app-title {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Main Container */
+.main-container {
+    padding: 16px 0;
+    min-height: calc(100vh - 68px);
+}
+
+/* Layout Management */
+.layout-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.central-content {
+    max-width: 500px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Ad Banners */
+.ad-banner {
+    width: 200px;
+    min-height: 600px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.ad-banner-left,
+.ad-banner-right {
+    position: sticky;
+    top: 100px;
+}
+
+/* Student Card */
+.card-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.student-card {
+    width: 100%;
+    max-width: 450px;
+    height: 260px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+}
+
+/* Card Background Pattern */
+.card-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(0, 0, 0, 0.02) 10px,
+            rgba(0, 0, 0, 0.02) 20px
+        ),
+        repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 10px,
+            rgba(0, 0, 0, 0.02) 10px,
+            rgba(0, 0, 0, 0.02) 20px
+        );
+}
+
+/* Card Watermark */
+.card-watermark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 15px 15px 30px;
+    opacity: 0.05;
+    filter: saturate(0);
+}
+
+.card-watermark img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+}
+
+/* Card Content */
+.card-content {
+    position: relative;
+    z-index: 1;
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.student-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #666;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+}
+
+.university-name {
+    font-size: 16px;
+    font-weight: 500;
+    color: #444;
+    text-transform: uppercase;
+}
+
+.university-logo-container {
+    width: 90px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.university-logo-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.card-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 8px 0;
+}
+
+.card-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Student Photo */
+.student-photo-container {
+    flex-shrink: 0;
+}
+
+.student-photo {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    border: 4px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.student-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.student-photo .material-icons {
+    font-size: 60px;
+    color: #999;
+}
+
+/* Student Info */
+.student-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.student-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.student-course {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.student-details {
+    display: flex;
+    gap: 24px;
+}
+
+.detail-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.detail-value {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Form Styles */
+.form-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.form-section {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.section-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.info-icon {
+    font-size: 16px;
+    color: #999;
+    cursor: help;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    font-size: 14px;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    background-color: #e8f4fd;
+    box-shadow: 0 0 0 2px #1976D2;
+}
+
+.form-input::placeholder {
+    color: #999;
+}
+
+/* File Input */
+.file-input-container {
+    height: 48px;
+    display: flex;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.file-input-button {
+    padding: 0 16px;
+    background-color: #e0e0e0;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.file-input-button:hover {
+    background-color: #d0d0d0;
+}
+
+.file-input-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    color: #666;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #1976D2;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #1565C0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #1976D2;
+    border: 2px solid #1976D2;
+}
+
+.btn-secondary:hover {
+    background-color: #1976D2;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+}
+
+.btn .material-icons {
+    font-size: 18px;
+}
+
+/* Download Container */
+.download-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+}
+
+/* PWA Banner */
+.pwa-banner {
+    background-color: white;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.pwa-icon {
+    flex-shrink: 0;
+}
+
+.pwa-icon .material-icons {
+    font-size: 40px;
+    color: #1976D2;
+}
+
+.pwa-content h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.pwa-content p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #1976D2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    color: white;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 950px) {
+    .ad-banner {
+        display: none;
+    }
+    
+    .layout-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .central-content {
+        max-width: 100%;
+        padding: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 12px;
+    }
+    
+    .student-card {
+        width: 100%;
+        height: auto;
+        min-height: 280px;
+    }
+    
+    .card-content {
+        padding: 16px;
+    }
+    
+    .card-main {
+        flex-direction: column;
+        text-align: center;
+        gap: 16px;
+    }
+    
+    .student-info {
+        align-items: center;
+    }
+    
+    .student-details {
+        justify-content: center;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .pwa-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .student-name {
+        font-size: 20px;
+    }
+    
+    .student-course {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .student-photo {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .student-photo .material-icons {
+        font-size: 45px;
+    }
+    
+    .student-name {
+        font-size: 18px;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    
+    .university-logo-container {
+        width: 80px;
+        height: 30px;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .student-card {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .app-header,
+    .form-container,
+    .download-container,
+    .pwa-banner,
+    .ad-banner {
+        display: none !important;
+    }
+    
+    .student-card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+    
+    body {
+        background-color: white;
+    }
+    
+    .main-container {
+        padding: 0;
+    }
+    
+    .layout-container {
+        justify-content: center;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus Styles */
+.btn:focus-visible,
+.form-input:focus-visible,
+.form-select:focus-visible,
+.file-input-button:focus-visible {
+    outline: 2px solid #1976D2;
+    outline-offset: 2px;
+}
+
+/* AdSense specific styles */
+.adsbygoogle {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Ensure ads are visible */
+.ad-banner .adsbygoogle {
+    min-height: 250px;
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+    /* Add dark mode styles if desired in the future */
+}

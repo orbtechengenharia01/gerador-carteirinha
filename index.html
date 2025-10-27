@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Carteirinha de Estudante Online e Grátis</title>
+    <meta name="description" content="Crie sua carteirinha de estudante personalizada em segundos. Ferramenta online, fácil de usar e totalmente grátis. Faça o download em PNG ou PDF.">
+    <meta name="keywords" content="gerador de carteirinha, carteirinha de estudante, criar carteirinha online, carteirinha grátis, carteirinha pdf, carteirinha universidade">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Gerador de Carteirinha">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="web/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="web/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="web/apple-touch-icon.png">
+    <link rel="icon" type="image/x-icon" href="web/favicon.ico">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="web/manifest.json">
+    
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6382507327811351" crossorigin="anonymous"></script>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="container">
+            <h1 class="app-title">Gerador de Carteirinha</h1>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="container">
+            <!-- Layout Container -->
+            <div class="layout-container">
+                <!-- Left Ad Banner (Desktop only) -->
+                <div class="ad-banner ad-banner-left">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-6382507327811351"
+                         data-ad-slot="6916028297"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+
+                <!-- Central Content -->
+                <div class="central-content">
+                    <!-- Card Preview -->
+                    <div class="card-container">
+                        <div class="student-card" id="studentCard">
+                            <!-- Background Pattern -->
+                            <div class="card-background"></div>
+                            
+                            <!-- University Logo Watermark -->
+                            <div class="card-watermark" id="cardWatermark"></div>
+                            
+                            <!-- Card Content -->
+                            <div class="card-content">
+                                <!-- Header -->
+                                <div class="card-header">
+                                    <div class="university-info">
+                                        <div class="student-label">ESTUDANTE</div>
+                                        <div class="university-name" id="universityNameDisplay">Nome da Universidade</div>
+                                    </div>
+                                    <div class="university-logo-container" id="universityLogoContainer">
+                                        <img id="universityLogo" src="" alt="" style="display: none;">
+                                    </div>
+                                </div>
+                                
+                                <!-- Divider -->
+                                <div class="card-divider"></div>
+                                
+                                <!-- Main Content -->
+                                <div class="card-main">
+                                    <!-- Student Photo -->
+                                    <div class="student-photo-container">
+                                        <div class="student-photo" id="studentPhoto">
+                                            <span class="material-icons">person</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Student Info -->
+                                    <div class="student-info">
+                                        <div class="student-name" id="studentNameDisplay">Nome do Aluno</div>
+                                        <div class="student-course" id="studentCourseDisplay">Curso do Aluno</div>
+                                        
+                                        <div class="student-details">
+                                            <div class="detail-group">
+                                                <div class="detail-label">RGM</div>
+                                                <div class="detail-value" id="studentRgmDisplay">0000000-0</div>
+                                            </div>
+                                            <div class="detail-group">
+                                                <div class="detail-label">VALIDADE</div>
+                                                <div class="detail-value" id="studentValidityDisplay">12/2027</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="form-container">
+                        <div class="form-section">
+                            <h2 class="section-title">Informações</h2>
+                            <div class="section-divider"></div>
+                            
+                            <div class="form-group">
+                                <label for="studentName" class="form-label">Nome Completo</label>
+                                <input type="text" id="studentName" class="form-input" placeholder="Ex: Ana Silva" value="Nome do Aluno">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="studentCourse" class="form-label">Curso</label>
+                                <input type="text" id="studentCourse" class="form-input" placeholder="Ex: Design Gráfico" value="Curso do Aluno">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="studentRgm" class="form-label">RGM / Matrícula</label>
+                                    <input type="text" id="studentRgm" class="form-input" placeholder="Ex: 1234567-8" value="0000000-0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentValidity" class="form-label">Validade</label>
+                                    <input type="text" id="studentValidity" class="form-input" placeholder="Ex: 12/2027" value="12/2027">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="universityName" class="form-label">Nome da Universidade</label>
+                                <input type="text" id="universityName" class="form-input" placeholder="Ex: Universidade Criativa" value="Nome da Universidade">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2 class="section-title">Imagens</h2>
+                            <div class="section-divider"></div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Foto do Aluno</label>
+                                <div class="file-input-container">
+                                    <input type="file" id="studentPhotoInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="file-input-button" onclick="document.getElementById('studentPhotoInput').click();">Escolher arquivo</button>
+                                    <span class="file-input-text" id="studentPhotoText">Escolher arquivo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="predefinedLogo" class="form-label">Logo da Universidade (da lista)</label>
+                                <select id="predefinedLogo" class="form-select">
+                                    <option value="Nenhum">Nenhum logo da lista</option>
+                                    <option value="FGV.png">FGV</option>
+                                    <option value="MACKENZIE.png">MACKENZIE</option>
+                                    <option value="PUC-Minas.png">PUC MINAS</option>
+                                    <option value="PUC-SP.png">PUC SP</option>
+                                    <option value="UFF.png">UFF</option>
+                                    <option value="UFMG.png">UFMG</option>
+                                    <option value="UFRJ.png">UFRJ</option>
+                                    <option value="UFU.png">UFU</option>
+                                    <option value="UFV.png">UFV</option>
+                                    <option value="UNESP.png">UNESP</option>
+                                    <option value="UNIBH.png">UNIBH</option>
+                                    <option value="UNICAMP.png">UNICAMP</option>
+                                    <option value="UNIUBE.png">UNIUBE</option>
+                                    <option value="USP.png">USP</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="customLogoGroup" style="display: none;">
+                                <label class="form-label">
+                                    Upload de Logo da Universidade (Opcional)
+                                    <span class="material-icons info-icon" title="Formato: PNG. Tamanho recomendado: 300x150 pixels (largura x altura).">info</span>
+                                </label>
+                                <div class="file-input-container">
+                                    <input type="file" id="customLogoInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="file-input-button" onclick="document.getElementById('customLogoInput').click();">Escolher arquivo</button>
+                                    <span class="file-input-text" id="customLogoText">Escolher arquivo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Download Buttons -->
+                    <div class="download-container">
+                        <button class="btn btn-primary" id="downloadPng">
+                            <span class="material-icons">image</span>
+                            Baixar Carteirinha (PNG)
+                        </button>
+                        <button class="btn btn-secondary" id="downloadPdf">
+                            <span class="material-icons">picture_as_pdf</span>
+                            Baixar Carteirinha (PDF)
+                        </button>
+                    </div>
+
+                    <!-- PWA Install Banner -->
+                    <div class="pwa-banner">
+                        <div class="pwa-icon">
+                            <span class="material-icons">install_mobile</span>
+                        </div>
+                        <div class="pwa-content">
+                            <h3>Instale na sua Tela Inicial!</h3>
+                            <p>Para uma experiência mais rápida, adicione nosso app à sua tela inicial. Procure a opção 'Instalar' ou 'Adicionar à Tela de Início' no menu do seu navegador.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Ad Banner (Desktop only) -->
+                <div class="ad-banner ad-banner-right">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-6382507327811351"
+                         data-ad-slot="7330961262"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Gerando carteirinha...</div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    
+    <!-- AdSense Script -->
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</body>
+</html>
