@@ -1,0 +1,27 @@
+{
+  "name": "gerador-carteirinha",
+  "version": "1.0.0",
+  "description": "Gerador de carteirinha de estudante online e grátis",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build needed'",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "carteirinha",
+    "estudante",
+    "gerador",
+    "pwa",
+    "brasil"
+  ],
+  "author": "Gerador Carteirinha",
+  "license": "MIT",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.x"
+  }
+}

@@ -10,6 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Gerador de Carteirinha">
+    <meta name="theme-color" content="#1976D2">
     
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="16x16" href="web/favicon-16x16.png">
@@ -19,9 +20,6 @@
     
     <!-- Manifest -->
     <link rel="manifest" href="web/manifest.json">
-    
-    <!-- AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6382507327811351" crossorigin="anonymous"></script>
     
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -35,6 +33,7 @@
     <!-- Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <!-- Header -->
@@ -49,14 +48,9 @@
         <div class="container">
             <!-- Layout Container -->
             <div class="layout-container">
-                <!-- Left Ad Banner (Desktop only) -->
+                <!-- Left Ad Banner (Desktop only) - PropellerAds -->
                 <div class="ad-banner ad-banner-left">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-6382507327811351"
-                         data-ad-slot="6916028297"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
+                    <script>(function(s){s.dataset.zone='10162863',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
                 </div>
 
                 <!-- Central Content -->
@@ -197,6 +191,12 @@
                         </div>
                     </div>
 
+                    <!-- PropellerAds Native Banner (Central) -->
+                    <div class="propeller-native-container">
+                        <div class="native-ad-label">Anúncio</div>
+                        <script>(function(s){s.dataset.zone='10162864',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+                    </div>
+
                     <!-- Download Buttons -->
                     <div class="download-container">
                         <button class="btn btn-primary" id="downloadPng">
@@ -207,6 +207,22 @@
                             <span class="material-icons">picture_as_pdf</span>
                             Baixar Carteirinha (PDF)
                         </button>
+                    </div>
+
+                    <!-- Suggestion Container -->
+                    <div class="suggestion-container">
+                        <h3 class="suggestion-title">💡 Sua universidade não está na lista?</h3>
+                        <p class="suggestion-subtitle">Sugira um logo e ajude a crescer nossa biblioteca!</p>
+                        
+                        <div class="suggestion-buttons">
+                            <button onclick="openLivePixModal()" class="btn btn-primary">
+                                💸 Doar R$ 5 via PIX
+                            </button>
+                            
+                            <a href="https://ko-fi.com/geradorcarteirinha" target="_blank" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
+                                ☕ Doar via Ko-fi
+                            </a>
+                        </div>
                     </div>
 
                     <!-- PWA Install Banner -->
@@ -221,14 +237,9 @@
                     </div>
                 </div>
 
-                <!-- Right Ad Banner (Desktop only) -->
+                <!-- Right Ad Banner (Desktop only) - PropellerAds -->
                 <div class="ad-banner ad-banner-right">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-6382507327811351"
-                         data-ad-slot="7330961262"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
+                    <script>(function(s){s.dataset.zone='10162863',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
                 </div>
             </div>
         </div>
@@ -240,13 +251,53 @@
         <div class="loading-text">Gerando carteirinha...</div>
     </div>
 
+    <!-- LivePix Modal -->
+    <div id="livePixModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeLivePixModal()">&times;</span>
+            
+            <div id="livePixForm">
+                <h3>💸 Sugerir Logo via PIX</h3>
+                <p>Contribua com R$ 5,00 e sugira um logo de universidade!</p>
+                
+                <form onsubmit="createPixPayment(event)">
+                    <input type="text" id="pixUsername" placeholder="Seu nome" required>
+                    <input type="text" id="pixLogoName" placeholder="Logo desejado (ex: UFSC)" required>
+                    <textarea id="pixMessage" placeholder="Mensagem adicional (opcional)" rows="3"></textarea>
+                    <button type="submit" class="btn btn-primary">Gerar QR Code PIX</button>
+                </form>
+            </div>
+            
+            <div id="livePixQR" style="display:none;">
+                <h3>📱 Escaneie o QR Code</h3>
+                <div id="qrCodeContainer"></div>
+                <p class="loading-text">Aguardando pagamento...</p>
+                <button onclick="checkPaymentStatus()" class="btn btn-secondary">Verificar Status</button>
+            </div>
+            
+            <div id="livePixSuccess" style="display:none;">
+                <h3>✅ Pagamento Confirmado!</h3>
+                <p>Obrigado pela sugestão! Logo será adicionado em breve.</p>
+                <button onclick="closeLivePixModal()" class="btn btn-primary">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="script.js"></script>
     
-    <!-- AdSense Script -->
+    <!-- PropellerAds OnClick Popunder -->
+    <script>(function(s){s.dataset.zone='10162697',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    
+    <!-- Ko-fi Widget -->
+    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
     <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        (adsbygoogle = window.adsbygoogle || []).push({});
+      kofiWidgetOverlay.draw('geradorcarteirinha', {
+        'type': 'floating-chat',
+        'floating-chat.donateButton.text': 'Sugerir Logo',
+        'floating-chat.donateButton.background-color': '#1976D2',
+        'floating-chat.donateButton.text-color': '#fff'
+      });
     </script>
 </body>
 </html>
