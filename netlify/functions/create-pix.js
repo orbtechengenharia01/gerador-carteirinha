@@ -26,15 +26,22 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Montar mensagem completa
-        const fullMessage = message 
+        // Mensagem final
+        const finalMessage = message 
             ? `Logo: ${logoName} - ${message}` 
             : `Logo: ${logoName}`;
 
-        // Obter token válido (auto-refresh)
+        // Obter token válido
         const token = await getValidToken();
 
-        // Chamar API LivePix v2/messages
+        console.log('Payload sendo enviado:', JSON.stringify({
+            username: username,
+            message: finalMessage,
+            amount: 500,
+            currency: 'BRL'
+        }));
+
+        // Tentar APENAS campos mínimos (sem redirectUrl)
         const response = await fetch('https://api.livepix.gg/v2/messages', {
             method: 'POST',
             headers: {
@@ -43,20 +50,21 @@ exports.handler = async (event, context) => {
             },
             body: JSON.stringify({
                 username: username,
-                message: fullMessage,
+                message: finalMessage,
                 amount: 500,
-                currency: 'BRL',
-                redirectUrl: 'https://geradorcarteirinha.site/?donation=success'
+                currency: 'BRL'
             })
         });
 
+        const responseText = await response.text();
+        console.log('LivePix Response Status:', response.status);
+        console.log('LivePix Response Body:', responseText);
+
         if (!response.ok) {
-            const errorData = await response.text();
-            console.error('LivePix API Error:', response.status, errorData);
-            throw new Error(`LivePix API retornou status ${response.status}`);
+            throw new Error(`LivePix API retornou status ${response.status}: ${responseText}`);
         }
 
-        const data = await response.json();
+        const data = JSON.parse(responseText);
 
         return {
             statusCode: 200,
@@ -65,7 +73,7 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('Erro ao criar PIX:', error);
+        console.error('Erro detalhado:', error);
         return {
             statusCode: 500,
             headers,
