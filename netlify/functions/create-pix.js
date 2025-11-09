@@ -26,15 +26,15 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Montar comentário (LivePix usa "comment", não "message")
-        const comment = message 
+        // Montar mensagem completa
+        const fullMessage = message 
             ? `Logo: ${logoName} - ${message}` 
             : `Logo: ${logoName}`;
 
-        // Obter token válido
+        // Obter token válido (auto-refresh)
         const token = await getValidToken();
 
-        // Chamar API LivePix (payload CORRETO)
+        // Chamar API LivePix v2/messages
         const response = await fetch('https://api.livepix.gg/v2/messages', {
             method: 'POST',
             headers: {
@@ -43,14 +43,16 @@ exports.handler = async (event, context) => {
             },
             body: JSON.stringify({
                 username: username,
-                comment: comment,  // ← "comment" ao invés de "message"
-                amount: 500  // R$ 5,00 (apenas amount, sem currency)
+                message: fullMessage,
+                amount: 500,
+                currency: 'BRL',
+                redirectUrl: 'https://geradorcarteirinha.site/?donation=success'
             })
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error('LivePix API Error:', response.status, errorText);
+            const errorData = await response.text();
+            console.error('LivePix API Error:', response.status, errorData);
             throw new Error(`LivePix API retornou status ${response.status}`);
         }
 
