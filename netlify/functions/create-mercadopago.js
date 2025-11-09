@@ -1,5 +1,5 @@
 // netlify/functions/create-mercadopago.js
-const mercadopago = require('mercadopago');
+const { MercadoPagoConfig, Preference } = require('mercadopago');
 
 exports.handler = async (event, context) => {
     const headers = {
@@ -25,13 +25,15 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Configurar Mercado Pago (TEST)
-        mercadopago.configure({
-            access_token: process.env.MERCADOPAGO_ACCESS_TOKEN
+        // Configurar cliente Mercado Pago (SDK v2)
+        const client = new MercadoPagoConfig({ 
+            accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN 
         });
+        
+        const preference = new Preference(client);
 
         // Criar preferência de pagamento
-        const preference = {
+        const body = {
             items: [{
                 title: 'Sugestão de Logo',
                 description: `Logo: ${logoName}`,
@@ -59,18 +61,18 @@ exports.handler = async (event, context) => {
             statement_descriptor: 'CARTEIRINHA'
         };
 
-        console.log('Criando preferência MP:', preference);
+        console.log('Criando preferência MP...');
 
-        const response = await mercadopago.preferences.create(preference);
+        const response = await preference.create({ body });
 
-        console.log('Preferência criada:', response.body);
+        console.log('Preferência criada:', response);
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({ 
-                init_point: response.body.init_point,
-                id: response.body.id
+                init_point: response.init_point,
+                id: response.id
             })
         };
 
