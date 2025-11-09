@@ -34,14 +34,7 @@ exports.handler = async (event, context) => {
         // Obter token válido
         const token = await getValidToken();
 
-        console.log('Payload sendo enviado:', JSON.stringify({
-            username: username,
-            message: finalMessage,
-            amount: 500,
-            currency: 'BRL'
-        }));
-
-        // Tentar APENAS campos mínimos (sem redirectUrl)
+        // Payload completo (COM redirectUrl obrigatório!)
         const response = await fetch('https://api.livepix.gg/v2/messages', {
             method: 'POST',
             headers: {
@@ -52,16 +45,16 @@ exports.handler = async (event, context) => {
                 username: username,
                 message: finalMessage,
                 amount: 500,
-                currency: 'BRL'
+                currency: 'BRL',
+                redirectUrl: 'https://geradorcarteirinha.site'  // ✅ OBRIGATÓRIO!
             })
         });
 
         const responseText = await response.text();
-        console.log('LivePix Response Status:', response.status);
-        console.log('LivePix Response Body:', responseText);
-
+        
         if (!response.ok) {
-            throw new Error(`LivePix API retornou status ${response.status}: ${responseText}`);
+            console.error('LivePix API Error:', response.status, responseText);
+            throw new Error(`LivePix API retornou status ${response.status}`);
         }
 
         const data = JSON.parse(responseText);
@@ -73,7 +66,7 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('Erro detalhado:', error);
+        console.error('Erro ao criar PIX:', error);
         return {
             statusCode: 500,
             headers,
