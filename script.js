@@ -406,57 +406,29 @@ window.CardGenerator = {
     hideLoading
 };
 
-// ========================================
-// LIVEPIX FUNCTIONS
-// ========================================
+// ============================================
+// MERCADO PAGO
+// ============================================
 
-// Abrir modal LivePix
-function openLivePixModal() {
-    const modal = document.getElementById('livePixModal');
-    const form = document.getElementById('livePixForm');
-    const qr = document.getElementById('livePixQR');
-    const success = document.getElementById('livePixSuccess');
-    
-    if (modal && form && qr && success) {
-        modal.style.display = 'flex';
-        form.style.display = 'block';
-        qr.style.display = 'none';
-        success.style.display = 'none';
-        
-        // Limpar formulário
-        document.getElementById('pixUsername').value = '';
-        document.getElementById('pixLogoName').value = '';
-        document.getElementById('pixMessage').value = '';
-    }
+// Abrir modal Mercado Pago
+function openMercadoPagoModal() {
+    document.getElementById('mercadoPagoModal').style.display = 'block';
 }
 
-// Fechar modal
-function closeLivePixModal() {
-    const modal = document.getElementById('livePixModal');
-    if (modal) {
-        modal.style.display = 'none';
-        
-        // Limpar interval se existir
-        if (window.paymentCheckInterval) {
-            clearInterval(window.paymentCheckInterval);
-            window.paymentCheckInterval = null;
-        }
-        
-        // Limpar QR Code
-        const qrContainer = document.getElementById('qrCodeContainer');
-        if (qrContainer) {
-            qrContainer.innerHTML = '';
-        }
-    }
+// Fechar modal Mercado Pago
+function closeMercadoPagoModal() {
+    document.getElementById('mercadoPagoModal').style.display = 'none';
+    // Limpar campos
+    document.getElementById('mpUsername').value = '';
+    document.getElementById('mpLogoName').value = '';
 }
 
-// Criar pagamento PIX
-async function createPixPayment(event) {
+// Criar pagamento Mercado Pago
+async function createMercadoPagoPayment(event) {
     event.preventDefault();
     
-    const username = document.getElementById('pixUsername').value;
-    const logoName = document.getElementById('pixLogoName').value;
-    const message = document.getElementById('pixMessage').value;
+    const username = document.getElementById('mpUsername').value;
+    const logoName = document.getElementById('mpLogoName').value;
     
     if (!username || !logoName) {
         alert('Por favor, preencha seu nome e o logo desejado.');
@@ -466,114 +438,41 @@ async function createPixPayment(event) {
     showLoading();
     
     try {
-        const response = await fetch('/.netlify/functions/create-pix', {
+        const response = await fetch('/.netlify/functions/create-mercadopago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, logoName, message })
+            body: JSON.stringify({ 
+                username: username.trim(), 
+                logoName: logoName.trim()
+            })
         });
         
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erro ao criar pagamento');
         }
         
         const data = await response.json();
         
-        if (data.data && data.data.reference) {
-            // Salvar referência para verificar status
-            window.pixReference = data.data.reference;
-            
-            // Mostrar QR Code
-            document.getElementById('livePixForm').style.display = 'none';
-            document.getElementById('livePixQR').style.display = 'block';
-            
-            // Limpar container antes de gerar novo QR
-            const qrContainer = document.getElementById('qrCodeContainer');
-            qrContainer.innerHTML = '';
-            
-            // Renderizar QR Code
-            if (window.QRCode && data.data.qrCode) {
-                new QRCode(qrContainer, {
-                    text: data.data.qrCode,
-                    width: 256,
-                    height: 256,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            } else {
-                qrContainer.innerHTML = '<p>Erro ao gerar QR Code. Tente novamente.</p>';
-            }
-            
-            // Iniciar verificação automática
-            startPaymentCheck();
+        if (data.init_point) {
+            // Redirecionar para checkout Mercado Pago
+            window.location.href = data.init_point;
         } else {
-            throw new Error('Resposta inválida da API');
+            throw new Error('URL de pagamento não retornada');
         }
         
     } catch (error) {
-        console.error('Erro ao criar PIX:', error);
-        alert('Erro ao processar pagamento. Verifique sua conexão e tente novamente.');
+        console.error('Erro ao criar pagamento:', error);
+        alert('Erro ao processar pagamento. Tente novamente.');
     } finally {
         hideLoading();
     }
 }
 
-// Verificar status do pagamento
-let paymentCheckInterval;
-let paymentCheckAttempts = 0;
-const MAX_CHECK_ATTEMPTS = 60; // 5 minutos (60 × 5s)
-
-function startPaymentCheck() {
-    paymentCheckAttempts = 0;
-    
-    // Limpar interval anterior se existir
-    if (paymentCheckInterval) {
-        clearInterval(paymentCheckInterval);
-    }
-    
-    // Iniciar novo interval
-    paymentCheckInterval = setInterval(checkPaymentStatus, 5000);
-}
-
-async function checkPaymentStatus() {
-    if (!window.pixReference) {
-        clearInterval(paymentCheckInterval);
-        return;
-    }
-    
-    paymentCheckAttempts++;
-    
-    // Timeout após 5 minutos
-    if (paymentCheckAttempts >= MAX_CHECK_ATTEMPTS) {
-        clearInterval(paymentCheckInterval);
-        console.log('Timeout: Verificação de pagamento encerrada após 5 minutos');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/.netlify/functions/check-payment?ref=${window.pixReference}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.status === 'paid') {
-            clearInterval(paymentCheckInterval);
-            document.getElementById('livePixQR').style.display = 'none';
-            document.getElementById('livePixSuccess').style.display = 'block';
-        }
-    } catch (error) {
-        console.error('Erro ao verificar pagamento:', error);
-        // Não interrompe o loop em caso de erro temporário
+// Fechar modal ao clicar fora (atualizar window.onclick)
+window.onclick = function(event) {
+    const mpModal = document.getElementById('mercadoPagoModal');
+    if (event.target == mpModal) {
+        closeMercadoPagoModal();
     }
 }
-
-// Fechar modal ao clicar fora
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('livePixModal');
-    if (event.target === modal) {
-        closeLivePixModal();
-    }
-});

@@ -615,7 +615,8 @@ body {
     max-width: 500px;
     margin-top: 32px;
     padding: 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffffff;
+    border: 2px solid #667EEA;
     border-radius: 16px;
     color: white;
     text-align: center;
@@ -625,13 +626,14 @@ body {
 .suggestion-title {
     font-size: 20px;
     font-weight: 700;
+    color: #333;
     margin-bottom: 8px;
 }
 
 .suggestion-subtitle {
-    font-size: 14px;
-    opacity: 0.95;
+    font-size: 16px;
     margin-bottom: 20px;
+    color: #555;
     line-height: 1.4;
 }
 

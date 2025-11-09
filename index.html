@@ -215,8 +215,8 @@
                         <p class="suggestion-subtitle">Sugira um logo e ajude a crescer nossa biblioteca!</p>
                         
                         <div class="suggestion-buttons">
-                            <button onclick="openLivePixModal()" class="btn btn-primary">
-                                💸 Doar R$ 5 via PIX
+                            <button class="btn btn-secondary" onclick="openMercadoPagoModal()">
+                                💸 Doar R$ 5 via PIX/Cartão
                             </button>
                             
                             <a href="https://ko-fi.com/geradorcarteirinha" target="_blank" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">
@@ -251,37 +251,41 @@
         <div class="loading-text">Gerando carteirinha...</div>
     </div>
 
-    <!-- LivePix Modal -->
-    <div id="livePixModal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeLivePixModal()">&times;</span>
+    <!-- Mercado Pago Modal -->
+   <div id="mercadoPagoModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeMercadoPagoModal()">&times;</span>
+        
+        <h3>💸 Sugerir Logo via PIX/Cartão</h3>
+        <p>Contribua com R$ 5,00 e sugira um logo de universidade!</p>
+        
+        <form onsubmit="createMercadoPagoPayment(event)">
+            <input 
+                type="text" 
+                id="mpUsername" 
+                placeholder="Seu nome" 
+                required
+                maxlength="50"
+            />
             
-            <div id="livePixForm">
-                <h3>💸 Sugerir Logo via PIX</h3>
-                <p>Contribua com R$ 5,00 e sugira um logo de universidade!</p>
-                
-                <form onsubmit="createPixPayment(event)">
-                    <input type="text" id="pixUsername" placeholder="Seu nome" required>
-                    <input type="text" id="pixLogoName" placeholder="Logo desejado (ex: UFSC)" required>
-                    <textarea id="pixMessage" placeholder="Mensagem adicional (opcional)" rows="3"></textarea>
-                    <button type="submit" class="btn btn-primary">Gerar QR Code PIX</button>
-                </form>
-            </div>
+            <input 
+                type="text" 
+                id="mpLogoName" 
+                placeholder="Logo desejado (ex: UFSC)" 
+                required
+                maxlength="50"
+            />
             
-            <div id="livePixQR" style="display:none;">
-                <h3>📱 Escaneie o QR Code</h3>
-                <div id="qrCodeContainer"></div>
-                <p class="loading-text">Aguardando pagamento...</p>
-                <button onclick="checkPaymentStatus()" class="btn btn-secondary">Verificar Status</button>
-            </div>
-            
-            <div id="livePixSuccess" style="display:none;">
-                <h3>✅ Pagamento Confirmado!</h3>
-                <p>Obrigado pela sugestão! Logo será adicionado em breve.</p>
-                <button onclick="closeLivePixModal()" class="btn btn-primary">Fechar</button>
-            </div>
-        </div>
+            <button type="submit" class="btn btn-primary">
+                Continuar para Pagamento
+            </button>
+        </form>
+        
+        <p style="margin-top: 15px; font-size: 12px; color: #666;">
+            ✅ PIX • Cartão • Boleto
+        </p>
     </div>
+</div>
 
     <!-- Scripts -->
     <script src="script.js"></script>
