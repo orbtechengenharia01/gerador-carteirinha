@@ -682,10 +682,11 @@ body {
    RESPONSIVE DESIGN
    ======================================== */
 
-@media (max-width: 950px) {
+@media (max-width: 1024px) {
     .ad-banner {
-        display: none;
+        display: none !important;  /* ✅ Remove banners laterais em tablets/mobile */
     }
+}
     
     .layout-container {
         flex-direction: column;

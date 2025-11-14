@@ -291,7 +291,17 @@
     <script src="script.js"></script>
     
     <!-- PropellerAds OnClick Popunder -->
-    <script>(function(s){s.dataset.zone='10162697',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+   <script>
+// Só desktop e máximo 1 vez por visita
+if (window.innerWidth > 768 && !sessionStorage.getItem('popunder_shown')) {
+  (function(s){
+    s.dataset.zone='10162697';
+    s.src='https://al5sm.com/tag.min.js';
+  })([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+  
+  sessionStorage.setItem('popunder_shown', 'true');
+}
+</script>
     
     <!-- Ko-fi Widget -->
     <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
