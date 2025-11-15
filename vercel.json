@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/.netlify/functions/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "env": {
+    "MERCADOPAGO_ACCESS_TOKEN": "@mercadopago_access_token"
+  }
+}

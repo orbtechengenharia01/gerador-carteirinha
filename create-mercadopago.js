@@ -1,31 +1,32 @@
-// netlify/functions/create-mercadopago.js
+// api/create-mercadopago.js
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 
-exports.handler = async (event, context) => {
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-    };
+export default async function handler(req, res) {
+    // CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
 
-    if (event.httpMethod === 'OPTIONS') {
-        return { statusCode: 200, headers, body: '' };
+    // Handle OPTIONS preflight
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    // Only POST allowed
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
-        const { username, logoName } = JSON.parse(event.body);
+        const { username, logoName } = req.body;
         
         if (!username || !logoName) {
-            return {
-                statusCode: 400,
-                headers,
-                body: JSON.stringify({ 
-                    error: 'Nome e logo são obrigatórios' 
-                })
-            };
+            return res.status(400).json({ 
+                error: 'Nome e logo são obrigatórios' 
+            });
         }
 
-        // Configurar cliente Mercado Pago (SDK v2)
+        // Configurar cliente Mercado Pago
         const client = new MercadoPagoConfig({ 
             accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN 
         });
@@ -61,31 +62,18 @@ exports.handler = async (event, context) => {
             statement_descriptor: 'CARTEIRINHA'
         };
 
-        console.log('Criando preferência MP...');
-
         const response = await preference.create({ body });
 
-        console.log('Preferência criada:', response);
-
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify({ 
-                init_point: response.init_point,
-                id: response.id
-            })
-        };
+        return res.status(200).json({ 
+            init_point: response.init_point,
+            id: response.id
+        });
 
     } catch (error) {
         console.error('Erro Mercado Pago:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ 
-                error: 'Erro ao criar pagamento',
-                message: error.message,
-                details: error.toString()
-            })
-        };
+        return res.status(500).json({ 
+            error: 'Erro ao criar pagamento',
+            message: error.message
+        });
     }
-};
+}

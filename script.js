@@ -438,7 +438,7 @@ async function createMercadoPagoPayment(event) {
     showLoading();
     
     try {
-        const response = await fetch('/.netlify/functions/create-mercadopago', {
+        const response = await fetch('/api/create-mercadopago', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
