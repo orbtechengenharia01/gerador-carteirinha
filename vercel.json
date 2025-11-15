@@ -10,8 +10,4 @@
       "source": "/.netlify/functions/:path*",
       "destination": "/api/:path*"
     }
-  ],
-  "env": {
-    "MERCADOPAGO_ACCESS_TOKEN": "@mercadopago_access_token"
-  }
-}
+  ]}
