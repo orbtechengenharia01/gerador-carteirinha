@@ -732,35 +732,34 @@ body {
     }
     
     .student-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.1),
-        0 2px 8px rgba(0, 0, 0, 0.08);
-    position: relative;
-    width: 100%;
-    max-width: 450px;
-    aspect-ratio: 1.586; /* Proporção cartão */
-    border: 3px solid #1976D2; /* ✅ ADICIONAR BORDA */
-}
-    
-    .card-content {
-        padding: 16px;
+        width: 100%;
+        max-width: 450px;
+        height: 260px;
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        position: relative;
+        margin: 0 auto;
+        /* ✅ SEM borda azul */
     }
     
+    .card-content {
+        padding: 20px;
+    }
+    
+    /* ✅ MANTER layout horizontal */
     .card-main {
-        flex-direction: column;
-        text-align: center;
-        gap: 16px;
+        flex-direction: row;
+        gap: 20px;
     }
     
     .student-info {
-        align-items: center;
+        align-items: flex-start;
     }
     
     .student-details {
-        justify-content: center;
+        justify-content: flex-start;
     }
     
     .form-row {

@@ -267,9 +267,10 @@ function hideLoading() {
     }
 }
 
-// Download as PNG (CORRIGIDO)
+
+// Download as PNG - COM SOMBRA
 async function downloadAsPng() {
-    if (!window.html2canvas) {
+    if (!window.domtoimage) {
         alert('Erro: Biblioteca de captura não carregada. Recarregue a página e tente novamente.');
         return;
     }
@@ -277,50 +278,58 @@ async function downloadAsPng() {
     showLoading();
     
     try {
-        // Aguardar imagens carregarem
         await waitForImagesToLoad();
+        await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Capturar card
-        const canvas = await html2canvas(elements.studentCard, {
-            scale: 3,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            allowTaint: false,
-            logging: false,
-            imageTimeout: 0,
-            removeContainer: true,
-            width: elements.studentCard.offsetWidth,
-            height: elements.studentCard.offsetHeight
+        // Criar wrapper com padding para sombra
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = `
+            padding: 30px;
+            background: white;
+            display: inline-block;
+        `;
+        
+        // Clonar card
+        const clone = elements.studentCard.cloneNode(true);
+        clone.style.cssText = `
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-radius: 16px;
+        `;
+        
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '-9999px';
+        wrapper.style.left = '-9999px';
+        
+        // Capturar wrapper
+        const dataUrl = await domtoimage.toPng(wrapper, {
+            quality: 1.0,
+            bgcolor: '#ffffff'
         });
         
-        // Converter para blob e download
-        canvas.toBlob(function(blob) {
-            if (!blob) {
-                throw new Error('Erro ao gerar imagem');
-            }
-            
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `carteirinha-${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            hideLoading();
-        }, 'image/png', 1.0);
+        // Remover wrapper
+        document.body.removeChild(wrapper);
+        
+        // Download
+        const link = document.createElement('a');
+        link.download = `carteirinha-${Date.now()}.png`;
+        link.href = dataUrl;
+        link.click();
+        
+        hideLoading();
         
     } catch (error) {
         console.error('Erro ao gerar PNG:', error);
-        alert('Erro ao gerar a imagem. Verifique se todas as imagens foram carregadas e tente novamente.');
+        alert('Erro ao gerar a imagem. Tente novamente.');
         hideLoading();
     }
 }
 
-// Download as PDF (CORRIGIDO)
+
+// Download as PDF - Usando dom-to-image
 async function downloadAsPdf() {
-    if (!window.html2canvas || !window.jspdf) {
+    if (!window.domtoimage || !window.jspdf) {
         alert('Erro: Bibliotecas necessárias não carregadas. Recarregue a página e tente novamente.');
         return;
     }
@@ -328,68 +337,47 @@ async function downloadAsPdf() {
     showLoading();
     
     try {
-        // Aguardar imagens carregarem
         await waitForImagesToLoad();
+        await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Capturar card
-        const canvas = await html2canvas(elements.studentCard, {
-            scale: 3,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            allowTaint: false,
-            logging: false,
-            imageTimeout: 0,
-            removeContainer: true,
-            width: elements.studentCard.offsetWidth,
-            height: elements.studentCard.offsetHeight
+        const dataUrl = await domtoimage.toPng(elements.studentCard, {
+            quality: 1.0,
+            bgcolor: '#ffffff'
         });
         
-        // Verificar se canvas foi gerado
-        if (!canvas || canvas.width === 0 || canvas.height === 0) {
-            throw new Error('Canvas vazio gerado');
-        }
-        
-        // Converter canvas para image data
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        
-        // Criar PDF
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         
-        // Calcular dimensões
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = 120;
-        const imgHeight = (canvas.height / canvas.width) * imgWidth;
+        
+        // Calcular dimensões mantendo proporção
+        const imgWidth = 160;
+        const imgHeight = (260 / 450) * imgWidth; // proporção do card
         const x = (pdfWidth - imgWidth) / 2;
         const y = (pdfHeight - imgHeight) / 2;
         
-        // Adicionar título
         pdf.setFontSize(24);
         pdf.setFont('helvetica', 'bold');
         pdf.text('Carteirinha de Estudante', pdfWidth / 2, 30, { align: 'center' });
         
-        // Adicionar imagem
-        pdf.addImage(imgData, 'PNG', x, y - 10, imgWidth, imgHeight, undefined, 'FAST');
+        pdf.addImage(dataUrl, 'PNG', x, y - 10, imgWidth, imgHeight, undefined, 'FAST');
         
-        // Adicionar rodapé
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(128, 128, 128);
         pdf.text('Gerado por geradorcarteirinha.site', pdfWidth / 2, pdfHeight - 20, { align: 'center' });
         
-        // Salvar PDF
         pdf.save(`carteirinha-${Date.now()}.pdf`);
         
         hideLoading();
         
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);
-        alert('Erro ao gerar o PDF. Verifique se todas as imagens foram carregadas e tente novamente.');
+        alert('Erro ao gerar o PDF. Tente novamente.');
         hideLoading();
     }
 }
-
 
 // Função auxiliar: Aguardar carregamento de imagens
 function waitForImagesToLoad() {
