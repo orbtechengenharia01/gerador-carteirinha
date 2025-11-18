@@ -21,6 +21,16 @@ const predefinedLogos = {
     'USP.png': 'USP'
 };
 
+// Mobile compatibility
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Fix para iOS
+if (isMobileDevice()) {
+    document.addEventListener('touchstart', function() {}, true);
+}
+
 // DOM Elements
 let elements = {};
 
@@ -145,7 +155,7 @@ function handlePredefinedLogoChange() {
     updateCardPreview();
 }
 
-// Handle student photo change
+// Handle student photo change (CORRIGIDO)
 function handleStudentPhotoChange(event) {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
@@ -153,16 +163,17 @@ function handleStudentPhotoChange(event) {
         reader.onload = function(e) {
             studentImageBytes = e.target.result;
             
-            // Create and display image
+            // Criar e display imagem COM crossOrigin
             const img = document.createElement('img');
+            img.crossOrigin = 'anonymous'; // ✅ IMPORTANTE!
             img.src = studentImageBytes;
             img.alt = 'Foto do estudante';
             
-            // Clear current content and add image
+            // Clear e adicionar
             elements.studentPhoto.innerHTML = '';
             elements.studentPhoto.appendChild(img);
             
-            // Update file input text
+            // Update text
             if (elements.studentPhotoText) {
                 elements.studentPhotoText.textContent = 'Foto escolhida';
             }
@@ -211,9 +222,10 @@ function handleCustomLogoChange(event) {
     }
 }
 
-// Show university logo
+// Show university logo (CORRIGIDO)
 function showUniversityLogo(src) {
     if (elements.universityLogo) {
+        elements.universityLogo.crossOrigin = 'anonymous'; // ✅
         elements.universityLogo.src = src;
         elements.universityLogo.style.display = 'block';
     }
@@ -221,6 +233,7 @@ function showUniversityLogo(src) {
     // Update watermark
     if (elements.cardWatermark) {
         const watermarkImg = document.createElement('img');
+        watermarkImg.crossOrigin = 'anonymous'; // ✅
         watermarkImg.src = src;
         watermarkImg.alt = '';
         elements.cardWatermark.innerHTML = '';
@@ -254,7 +267,7 @@ function hideLoading() {
     }
 }
 
-// Download as PNG
+// Download as PNG (CORRIGIDO)
 async function downloadAsPng() {
     if (!window.html2canvas) {
         alert('Erro: Biblioteca de captura não carregada. Recarregue a página e tente novamente.');
@@ -264,24 +277,32 @@ async function downloadAsPng() {
     showLoading();
     
     try {
-        // Use html2canvas to capture the card
+        // Aguardar imagens carregarem
+        await waitForImagesToLoad();
+        
+        // Capturar card
         const canvas = await html2canvas(elements.studentCard, {
             scale: 3,
             backgroundColor: '#ffffff',
             useCORS: true,
-            allowTaint: true,
+            allowTaint: false,
             logging: false,
+            imageTimeout: 0,
+            removeContainer: true,
             width: elements.studentCard.offsetWidth,
-            height: elements.studentCard.offsetHeight,
-            foreignObjectRendering: true
+            height: elements.studentCard.offsetHeight
         });
         
-        // Convert to blob and download
+        // Converter para blob e download
         canvas.toBlob(function(blob) {
+            if (!blob) {
+                throw new Error('Erro ao gerar imagem');
+            }
+            
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'carteirinha-estudante.png';
+            a.download = `carteirinha-${Date.now()}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -292,12 +313,12 @@ async function downloadAsPng() {
         
     } catch (error) {
         console.error('Erro ao gerar PNG:', error);
-        alert('Erro ao gerar a imagem. Tente novamente.');
+        alert('Erro ao gerar a imagem. Verifique se todas as imagens foram carregadas e tente novamente.');
         hideLoading();
     }
 }
 
-// Download as PDF
+// Download as PDF (CORRIGIDO)
 async function downloadAsPdf() {
     if (!window.html2canvas || !window.jspdf) {
         alert('Erro: Bibliotecas necessárias não carregadas. Recarregue a página e tente novamente.');
@@ -307,57 +328,99 @@ async function downloadAsPdf() {
     showLoading();
     
     try {
-        // First, capture as canvas
+        // Aguardar imagens carregarem
+        await waitForImagesToLoad();
+        
+        // Capturar card
         const canvas = await html2canvas(elements.studentCard, {
             scale: 3,
             backgroundColor: '#ffffff',
             useCORS: true,
-            allowTaint: true,
+            allowTaint: false,
             logging: false,
+            imageTimeout: 0,
+            removeContainer: true,
             width: elements.studentCard.offsetWidth,
-            height: elements.studentCard.offsetHeight,
-            foreignObjectRendering: true
+            height: elements.studentCard.offsetHeight
         });
         
-        // Convert canvas to image data
+        // Verificar se canvas foi gerado
+        if (!canvas || canvas.width === 0 || canvas.height === 0) {
+            throw new Error('Canvas vazio gerado');
+        }
+        
+        // Converter canvas para image data
         const imgData = canvas.toDataURL('image/png', 1.0);
         
-        // Create PDF
+        // Criar PDF
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
         
-        // Calculate dimensions to center the card
+        // Calcular dimensões
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = 120; // Card width in mm
-        const imgHeight = (canvas.height / canvas.width) * imgWidth; // Maintain aspect ratio
+        const imgWidth = 120;
+        const imgHeight = (canvas.height / canvas.width) * imgWidth;
         const x = (pdfWidth - imgWidth) / 2;
         const y = (pdfHeight - imgHeight) / 2;
         
-        // Add title
+        // Adicionar título
         pdf.setFontSize(24);
         pdf.setFont('helvetica', 'bold');
         pdf.text('Carteirinha de Estudante', pdfWidth / 2, 30, { align: 'center' });
         
-        // Add image
-        pdf.addImage(imgData, 'PNG', x, y - 10, imgWidth, imgHeight);
+        // Adicionar imagem
+        pdf.addImage(imgData, 'PNG', x, y - 10, imgWidth, imgHeight, undefined, 'FAST');
         
-        // Add footer
+        // Adicionar rodapé
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'normal');
         pdf.setTextColor(128, 128, 128);
-        pdf.text('Gerado por Gerador de Carteirinha App', pdfWidth / 2, pdfHeight - 20, { align: 'center' });
+        pdf.text('Gerado por geradorcarteirinha.site', pdfWidth / 2, pdfHeight - 20, { align: 'center' });
         
-        // Save PDF
-        pdf.save('carteirinha-estudante.pdf');
+        // Salvar PDF
+        pdf.save(`carteirinha-${Date.now()}.pdf`);
         
         hideLoading();
         
     } catch (error) {
         console.error('Erro ao gerar PDF:', error);
-        alert('Erro ao gerar o PDF. Tente novamente.');
+        alert('Erro ao gerar o PDF. Verifique se todas as imagens foram carregadas e tente novamente.');
         hideLoading();
     }
+}
+
+
+// Função auxiliar: Aguardar carregamento de imagens
+function waitForImagesToLoad() {
+    return new Promise((resolve) => {
+        const images = elements.studentCard.querySelectorAll('img');
+        
+        if (images.length === 0) {
+            resolve();
+            return;
+        }
+        
+        let loadedCount = 0;
+        const totalImages = images.length;
+        
+        const checkComplete = () => {
+            loadedCount++;
+            if (loadedCount === totalImages) {
+                // Aguardar mais 100ms para garantir
+                setTimeout(resolve, 100);
+            }
+        };
+        
+        images.forEach(img => {
+            if (img.complete) {
+                checkComplete();
+            } else {
+                img.addEventListener('load', checkComplete);
+                img.addEventListener('error', checkComplete);
+            }
+        });
+    });
 }
 
 // Error handling
